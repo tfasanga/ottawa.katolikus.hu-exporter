@@ -1,6 +1,3 @@
-/**
- *
- */
 package info.ottawaimagyar.katolikus.exporter;
 
 public class ExporterMain

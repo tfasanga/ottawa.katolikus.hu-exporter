@@ -1,6 +1,3 @@
-/**
- *
- */
 package info.ottawaimagyar.katolikus.exporter;
 
 import org.jsoup.Connection;
@@ -11,10 +8,16 @@ import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 
 public class Exporter
 {
+    public static String getSiteUrl()
+    {
+        return "http://ottawa.katolikus.ca";
+    }
+
     public void runWithArguments(String[] args) throws IOException
     {
         System.out.println("args = " + Arrays.toString(args));
@@ -24,11 +27,15 @@ public class Exporter
 
     private void parseHirek() throws IOException
     {
-        final String lMainUrl = "http://ottawa.katolikus.ca";
+        Collection<Image> lImageList = new ArrayList<>();
+
+        final String lMainUrl = getSiteUrl();
         final String lHirekUrl = lMainUrl + "/" + "hirek";
         Connection lConnection = Jsoup.connect(lHirekUrl);
         Document lDocument = lConnection.get();
+
         Set<String> lPageLinkSet = new LinkedHashSet<>();
+
         Elements lPagers = lDocument.getElementsByClass("pager");
         if(lPagers.size() > 0)
         {
@@ -41,16 +48,19 @@ public class Exporter
             }
 
             System.out.println("lPageLinkSet.size() = " + lPageLinkSet.size());
-
-//            for (String lHref : lPageLinkSet)
-//            {
-//                System.out.println("lHref = " + lHref);
-//            }
         }
+
+        LinkedList<String> lPageLinkList = new LinkedList<>();
+        for (String lPageLink : lPageLinkSet)
+        {
+            lPageLinkList.add(lPageLink);
+        }
+
+        Collections.reverse(lPageLinkList);
 
         List<Post> lPosts = new ArrayList<>();
 
-        for (String lPageLink : lPageLinkSet)
+        for (String lPageLink : lPageLinkList)
         {
             String lPageUrl = lHirekUrl + "/" + lPageLink;
             lConnection.url(lPageUrl);
@@ -73,10 +83,6 @@ public class Exporter
                     String lPostUrl = lMainUrl + lPostLink;
                     Post lPost = new Post(lPostUrl);
                     lPosts.add(lPost);
-
-                    Elements lDateElements = lContent.getElementsByClass("date");
-                    Node lDateStr = lDateElements.first().childNode(0);
-                    lPost.setDateStr(lDateStr);
                 }
                 else
                 {
@@ -91,5 +97,40 @@ public class Exporter
         {
             System.out.println("lPost = " + lPost);
         }
+
+        Iterator<Post> lIterator = lPosts.iterator();
+        if(lIterator.hasNext())
+        {
+            Post lPost = lIterator.next();
+
+            lPost.download(lConnection, lImageList);
+        }
+
+        if(!lImageList.isEmpty())
+        {
+            Map<String, Image> lImageMap = new LinkedHashMap<>();
+
+            for (Image lImage : lImageList)
+            {
+                lImageMap.put(lImage.getUrl(), lImage);
+            }
+
+            try(PrintWriter writer = new PrintWriter("images.xml", "UTF-8");)
+            {
+                XmlWriter lXmlWriter = new XmlWriter(writer, 4);
+                lXmlWriter.begin();
+
+                lXmlWriter.start("images");
+                for (Map.Entry<String, Image> lEntry : lImageMap.entrySet())
+                {
+                    Image lImage = lEntry.getValue();
+                    String lUrl = lEntry.getKey();
+
+                    lXmlWriter.contentTag("img-url", lUrl);
+                }
+                lXmlWriter.end();
+            }
+        }
+
     }
 }
