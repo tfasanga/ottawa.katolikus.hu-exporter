@@ -95,10 +95,7 @@ public class Exporter
             break;
         }
 
-        for (Post lPost : lPosts)
-        {
-            System.out.println("lPost = " + lPost);
-        }
+        System.out.println("Number of posts: " + lPosts.size());
 
         Iterator<Post> lIterator = lPosts.iterator();
         while(lIterator.hasNext())
@@ -161,7 +158,7 @@ public class Exporter
             lRss.add("xmlns:content", "http://purl.org/rss/1.0/modules/content/");
             lRss.add("xmlns:wfw", "http://wellformedweb.org/CommentAPI/");
             lRss.add("xmlns:dc", "http://purl.org/dc/elements/1.1/");
-            lRss.add("xmlns:wp", "http://wordpress.org/export/1.2/");
+            //lRss.add("xmlns:wp", "http://wordpress.org/export/1.2/");
 
             lXmlWriter.start("rss", lRss);
 
@@ -175,6 +172,8 @@ public class Exporter
 
             for (Post lPost : aInPosts)
             {
+                System.out.println("Generating RSS item for " + lPost.getTitle());
+
                 lXmlWriter.start("item");
 
                 lXmlWriter.contentTag("title", lPost.getTitle());
@@ -183,7 +182,6 @@ public class Exporter
                 if(lDate != null)
                 {
                     lXmlWriter.contentTag("pubDate", lDate.toRssPubDate());
-                    lXmlWriter.contentTag("wp:post_date", lDate.toWpPostDate());
                 }
                 else
                 {
@@ -199,6 +197,8 @@ public class Exporter
                 lCategory.add("domain", "category");
                 lCategory.add("nicename", "hirek");
                 lXmlWriter.contentTagCData("category", lCategory, "Hírek");
+
+                lXmlWriter.end(); // item
             }
 
             lXmlWriter.end(); // channel

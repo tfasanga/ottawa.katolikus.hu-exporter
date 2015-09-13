@@ -119,6 +119,12 @@ public class Post
         {
             for (Element lImageElement : lImageElements)
             {
+                String lSrc = lImageElement.attr("src");
+                if(lSrc.startsWith("/"))
+                {
+                    String lNewSrc = Exporter.getSiteUrl() + lSrc;
+                    lImageElement.attr("src", lNewSrc);
+                }
                 Image lImage = new Image(lImageElement);
                 aInImages.add(lImage);
             }
