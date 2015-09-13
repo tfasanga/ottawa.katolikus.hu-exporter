@@ -17,7 +17,8 @@ public class Post
     private final String url;
     private String title;
     private String content;
-    private String date;
+    private PostDate date;
+    private String excerpt;
 
     public Post(String aInUrl)
     {
@@ -28,6 +29,26 @@ public class Post
     public String toString()
     {
         return url + ", " + title + ", " + date;
+    }
+
+    public String getUrl()
+    {
+        return url;
+    }
+
+    public String getTitle()
+    {
+        return title;
+    }
+
+    public String getContent()
+    {
+        return content;
+    }
+
+    public PostDate getDate()
+    {
+        return date;
     }
 
     public void download(Connection aInConnection, Collection<Image> images) throws IOException
@@ -70,6 +91,10 @@ public class Post
                 }
                 else
                 {
+                    if(excerpt == null && lChildElement.tagName().equals("p"))
+                    {
+                        excerpt = lChildElement.text();
+                    }
                     String lStr = lChildElement.toString();
                     sb.append(lStr);
                 }
@@ -78,7 +103,8 @@ public class Post
             content = sb.toString();
 
             Elements lDateElements = lContent.getElementsByClass("date");
-            date = lDateElements.first().html();
+            String lHunDate = lDateElements.first().html();
+            date = new PostDate(lHunDate);
         }
         else
         {
@@ -125,5 +151,10 @@ public class Post
             throw new RuntimeException(lNode.nodeName() + " != " + aInElement.tagName());
         }
         return lNode;
+    }
+
+    public String getExcerpt()
+    {
+        return excerpt == null ? "" : excerpt;
     }
 }

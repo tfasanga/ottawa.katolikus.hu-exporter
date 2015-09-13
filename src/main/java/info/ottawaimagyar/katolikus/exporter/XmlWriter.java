@@ -7,6 +7,7 @@ package info.ottawaimagyar.katolikus.exporter;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utility class for writing XML files. This class provides convenience
@@ -281,6 +282,11 @@ public class XmlWriter {
         tag(tag, names, values, nattr, false);
     }
 
+    public void start(String tag, Attributes attrs)
+    {
+        tag(tag, attrs.getNames(), attrs.getValues(), attrs.size(), false);
+    }
+
     /**
      * Print a start tag without attributes. The tag will be followed by a
      * newline, and the indentation level will be increased.
@@ -339,12 +345,34 @@ public class XmlWriter {
         println();
     }
 
+    public void contentTagCData(String tag, String content) {
+        spacing();
+        m_out.print('<'); m_out.print(tag); m_out.print('>');
+        m_out.print("<![CDATA[");
+        m_out.print(content);
+        m_out.print("]]>");
+        m_out.print('<'); m_out.print('/'); m_out.print(tag); m_out.print('>');
+        println();
+    }
+
+    public void contentTagCData(String tag, Attributes attrs, String content) {
+        start(tag, attrs);
+        contentCData(content);
+        end(); // item
+    }
+
     /**
      * Print content text.
      * @param content the content text, this text will be escaped
      */
     public void content(String content) {
         escapeString(content);
+    }
+
+    public void contentCData(String content) {
+        m_out.print("<![CDATA[");
+        m_out.print(content);
+        m_out.print("]]>");
     }
 
     /**
@@ -429,6 +457,39 @@ public class XmlWriter {
                     m_out.print(c);
                 }
             }
+        }
+    }
+
+    public static class Attributes
+    {
+        private final ArrayList<String> names;
+        private final ArrayList<String> values;
+
+        public Attributes()
+        {
+            names = new ArrayList<>();
+            values = new ArrayList<>();
+        }
+
+        public void add(String name, String value)
+        {
+            names.add(name);
+            values.add(value);
+        }
+
+        public int size()
+        {
+            return names.size();
+        }
+
+        public ArrayList<String> getNames()
+        {
+            return names;
+        }
+
+        public ArrayList<String> getValues()
+        {
+            return values;
         }
     }
 
