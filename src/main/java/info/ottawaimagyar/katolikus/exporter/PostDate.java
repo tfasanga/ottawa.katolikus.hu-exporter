@@ -27,7 +27,7 @@ public class PostDate
         dict.put("július", "Jul");
         dict.put("augusztus", "Aug");
         dict.put("szeptember", "Sep");
-        dict.put("október", "Oct");
+        dict.put("okt"+(char)243+"ber", "Oct");
         dict.put("november", "Nov");
         dict.put("december", "Dec");
 
