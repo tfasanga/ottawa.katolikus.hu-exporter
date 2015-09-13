@@ -36,10 +36,70 @@ public class Exporter
         Connection lConnection = Jsoup.connect(lHirekUrl);
         Document lDocument = lConnection.get();
 
+        List<String> lPageLinkList = getPageLinks(lDocument);
+
+        PostList lPosts = new PostList(20);
+
+        for (String lPageLink : lPageLinkList)
+        {
+            String lPageUrl = lHirekUrl + "/" + lPageLink;
+            lConnection.url(lPageUrl);
+
+            System.out.println("Getting Page, Url = " + lPageUrl);
+
+            Document lPageDocument = lConnection.get();
+
+            Element lMain = lPageDocument.getElementById("main");
+
+            Elements lContents = lMain.getElementsByClass("content");
+
+            int lPageNum = extractPageNum(lPageLink);
+
+            System.out.println("Page #" + lPageNum + " has " + lContents.size() + " posts");
+
+            for (Element lContent : lContents)
+            {
+                Elements lReadmoreElements = lContent.getElementsByClass("readmore");
+                if (!lReadmoreElements.isEmpty())
+                {
+                    Element lFirst = lReadmoreElements.first();
+                    String lPostLink = lFirst.attr("href");
+                    String lPostUrl = lMainUrl + lPostLink;
+                    Post lPost = new Post(lPostUrl);
+                    lPosts.add(lPost);
+                } else
+                {
+                    System.out.println("There is no ReadmoreElement");
+                }
+            }
+            //break; // enable for test only
+        }
+
+        List<List<Post>> lBucketList = lPosts.getBucketList();
+
+        System.out.println("Number of buckets: " + lBucketList.size());
+        System.out.println("Number of posts: " + lPosts.size());
+
+        int lNum = 0;
+        for (List<Post> lPostList : lBucketList)
+        {
+            for (Post lPost : lPostList)
+            {
+                lPost.download(lConnection, lImageList);
+            }
+
+            savePostsAsWordpressRssXml(lPostList, ++lNum);
+        }
+
+        saveImageLinks(lImageList);
+    }
+
+    private List<String> getPageLinks(Document aInDocument)
+    {
         Set<String> lPageLinkSet = new LinkedHashSet<>();
 
-        Elements lPagers = lDocument.getElementsByClass("pager");
-        if(lPagers.size() > 0)
+        Elements lPagers = aInDocument.getElementsByClass("pager");
+        if (lPagers.size() > 0)
         {
             Element lFirstPager = lPagers.first();
             List<Node> lChildNodes = lFirstPager.childNodes();
@@ -48,9 +108,9 @@ public class Exporter
                 String lHref = lChildNode.attr("href");
                 lPageLinkSet.add(lHref);
             }
-
-            System.out.println("lPageLinkSet.size() = " + lPageLinkSet.size());
         }
+
+        System.out.println("Number of pages: " + lPageLinkSet.size());
 
         LinkedList<String> lPageLinkList = new LinkedList<>();
         for (String lPageLink : lPageLinkSet)
@@ -60,60 +120,13 @@ public class Exporter
 
         Collections.reverse(lPageLinkList);
 
-        List<Post> lPosts = new ArrayList<>();
+        return lPageLinkList;
+    }
 
-        for (String lPageLink : lPageLinkList)
-        {
-            String lPageUrl = lHirekUrl + "/" + lPageLink;
-            lConnection.url(lPageUrl);
-            System.out.println("lPageUrl = " + lPageUrl);
-
-            Document lPageDocument = lConnection.get();
-
-            Element lMain = lPageDocument.getElementById("main");
-
-            Elements lContents = lMain.getElementsByClass("content");
-            System.out.println("Page / items = [" + lPageLink + "] -> " + lContents.size());
-
-            for (Element lContent : lContents)
-            {
-                Elements lReadmoreElements = lContent.getElementsByClass("readmore");
-                if(!lReadmoreElements.isEmpty())
-                {
-                    Element lFirst = lReadmoreElements.first();
-                    String lPostLink = lFirst.attr("href");
-                    String lPostUrl = lMainUrl + lPostLink;
-                    Post lPost = new Post(lPostUrl);
-                    lPosts.add(lPost);
-                }
-                else
-                {
-                    System.out.println("There is no ReadmoreElement");
-                }
-            }
-
-            break;
-        }
-
-        System.out.println("Number of posts: " + lPosts.size());
-
-        Iterator<Post> lIterator = lPosts.iterator();
-        while(lIterator.hasNext())
-        {
-            Post lPost = lIterator.next();
-
-            lPost.download(lConnection, lImageList);
-        }
-
-        if(!lImageList.isEmpty())
-        {
-            saveImageLinks(lImageList);
-        }
-
-        if(!lPosts.isEmpty())
-        {
-            savePostsAsWordpressRssXml(lPosts);
-        }
+    private static int extractPageNum(String lPageLink)
+    {
+        String[] lSplit = lPageLink.split("=");
+        return Integer.parseInt(lSplit[1]);
     }
 
     private void saveImageLinks(Collection<Image> aInImageList)
@@ -126,7 +139,7 @@ public class Exporter
             lImageMap.put(lImage.getUrl(), lImage);
         }
 
-        try(PrintWriter lPrintWriter = new PrintWriter("images.xml", "UTF-8");)
+        try (PrintWriter lPrintWriter = new PrintWriter("images.xml", "UTF-8");)
         {
             XmlWriter lXmlWriter = new XmlWriter(lPrintWriter, 4);
             lXmlWriter.begin();
@@ -139,15 +152,15 @@ public class Exporter
             lXmlWriter.end();
         }
 
-        try(PrintWriter lPrintWriter = new PrintWriter("images.txt", "UTF-8");)
+        try (PrintWriter lPrintWriter = new PrintWriter("images.txt", "UTF-8");)
         {
             lImageMap.keySet().forEach(lPrintWriter::println);
         }
     }
 
-    void savePostsAsWordpressRssXml(List<Post> aInPosts) throws FileNotFoundException, UnsupportedEncodingException
+    void savePostsAsWordpressRssXml(List<Post> aInPosts, int aInNumber) throws FileNotFoundException, UnsupportedEncodingException
     {
-        try(PrintWriter lPrintWriter = new PrintWriter("posts.xml", "UTF-8");)
+        try (PrintWriter lPrintWriter = new PrintWriter("posts_" + aInNumber + ".xml", "UTF-8");)
         {
             XmlWriter lXmlWriter = new XmlWriter(lPrintWriter, 4);
             lXmlWriter.begin();
@@ -158,7 +171,6 @@ public class Exporter
             lRss.add("xmlns:content", "http://purl.org/rss/1.0/modules/content/");
             lRss.add("xmlns:wfw", "http://wellformedweb.org/CommentAPI/");
             lRss.add("xmlns:dc", "http://purl.org/dc/elements/1.1/");
-            //lRss.add("xmlns:wp", "http://wordpress.org/export/1.2/");
 
             lXmlWriter.start("rss", lRss);
 
@@ -179,11 +191,10 @@ public class Exporter
                 lXmlWriter.contentTag("title", lPost.getTitle());
                 lXmlWriter.contentTag("link", lPost.getUrl());
                 PostDate lDate = lPost.getDate();
-                if(lDate != null)
+                if (lDate != null)
                 {
                     lXmlWriter.contentTag("pubDate", lDate.toRssPubDate());
-                }
-                else
+                } else
                 {
                     System.out.println("Post has no date: " + lPost);
                 }
