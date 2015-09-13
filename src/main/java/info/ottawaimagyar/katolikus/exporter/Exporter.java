@@ -80,15 +80,18 @@ public class Exporter
         System.out.println("Number of buckets: " + lBucketList.size());
         System.out.println("Number of posts: " + lPosts.size());
 
-        int lNum = 0;
+        int lNum = 1;
         for (List<Post> lPostList : lBucketList)
         {
+            System.out.println("Starting downloading batch #" + lNum);
+
             for (Post lPost : lPostList)
             {
                 lPost.download(lConnection, lImageList);
+                System.out.println("Downloaded post: " + lPost);
             }
 
-            savePostsAsWordpressRssXml(lPostList, ++lNum);
+            savePostsAsWordpressRssXml(lPostList, lNum++);
         }
 
         saveImageLinks(lImageList);
@@ -160,7 +163,10 @@ public class Exporter
 
     void savePostsAsWordpressRssXml(List<Post> aInPosts, int aInNumber) throws FileNotFoundException, UnsupportedEncodingException
     {
-        try (PrintWriter lPrintWriter = new PrintWriter("posts_" + aInNumber + ".xml", "UTF-8");)
+        String lFileName = "posts_" + aInNumber + ".xml";
+        System.out.println("Saving post to file " + lFileName);
+
+        try (PrintWriter lPrintWriter = new PrintWriter(lFileName, "UTF-8");)
         {
             XmlWriter lXmlWriter = new XmlWriter(lPrintWriter, 4);
             lXmlWriter.begin();

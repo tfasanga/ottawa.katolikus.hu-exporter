@@ -18,26 +18,26 @@ public class PostDate
     static
     {
         dict = new HashMap<>();
-        dict.put("január", "Jan");
-        dict.put("február", "Feb");
-        dict.put("március", "Mar");
-        dict.put("április", "Apr");
-        dict.put("május", "May");
-        dict.put("június", "Jun");
-        dict.put("július", "Jul");
+        dict.put("janu"+(char)225+"r", "Jan");
+        dict.put("febru"+(char)225+"r", "Feb");
+        dict.put("m"+(char)225+"rcius", "Mar");
+        dict.put((char)225+"prilis", "Apr");
+        dict.put("m"+(char)225+"jus", "May");
+        dict.put("j"+(char)250+"nius", "Jun");
+        dict.put("j"+(char)250+"lius", "Jul");
         dict.put("augusztus", "Aug");
         dict.put("szeptember", "Sep");
         dict.put("okt"+(char)243+"ber", "Oct");
         dict.put("november", "Nov");
         dict.put("december", "Dec");
 
-        dict.put("hétf?", "Mon");
+        dict.put("h"+(char)233+"tf"+(char)337, "Mon");
         dict.put("kedd", "Tue");
         dict.put("szerda", "Wed");
-        dict.put("csütörtök", "Thu");
-        dict.put("péntek", "Fri");
+        dict.put("cs"+(char)252+"t"+(char)246+"rt"+(char)246+"k", "Thu");
+        dict.put("p"+(char)233+"ntek", "Fri");
         dict.put("szombat", "Sat");
-        dict.put("vasárnap", "Sun");
+        dict.put("vas"+(char)225+"rnap", "Sun");
 
         dict.put("Jan", "1");
         dict.put("Feb", "2");

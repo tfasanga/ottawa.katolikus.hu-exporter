@@ -24,7 +24,7 @@ public class Image
         url = buildUrl(src);
 
         String lWidth = aInElement.attr("width");
-        if(lWidth != null)
+        if(lWidth != null && !lWidth.isEmpty())
         {
             width = Integer.parseInt(lWidth);
         }
@@ -34,7 +34,7 @@ public class Image
         }
 
         String lHeight = aInElement.attr("height");
-        if(lHeight != null)
+        if(lHeight != null && !lHeight.isEmpty())
         {
             height = Integer.parseInt(lHeight);
         }
