@@ -84,7 +84,7 @@ public class XmlWriter {
      * the top of the output stream.
      */
     public void begin() {
-        m_out.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        m_out.print("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
         println();
     }
 

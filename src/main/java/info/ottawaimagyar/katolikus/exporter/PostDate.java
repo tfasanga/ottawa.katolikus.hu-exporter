@@ -32,6 +32,25 @@ public class PostDate
         dict.put("december", "Dec");
 
         dict.put("hétf?", "Mon");
+        dict.put("kedd", "Tue");
+        dict.put("szerda", "Wed");
+        dict.put("csütörtök", "Thu");
+        dict.put("péntek", "Fri");
+        dict.put("szombat", "Sat");
+        dict.put("vasárnap", "Sun");
+
+        dict.put("Jan", "1");
+        dict.put("Feb", "2");
+        dict.put("Mar", "3");
+        dict.put("Apr", "4");
+        dict.put("May", "5");
+        dict.put("Jun", "6");
+        dict.put("Jul", "7");
+        dict.put("Aug", "8");
+        dict.put("Sep", "9");
+        dict.put("Oct", "10");
+        dict.put("Nov", "11");
+        dict.put("Dec", "12");
     }
 
     // "2010. november 6. (szombat) 12:59"
@@ -70,7 +89,7 @@ public class PostDate
         // <wp:post_date>2010-10-31 19:28:57</wp:post_date>
         String lValue =
                 year + "-" +
-                month + "-" + // TODO must be month number
+                translate(month) + "-" +
                 dayNum + " " +
                 hour;
 

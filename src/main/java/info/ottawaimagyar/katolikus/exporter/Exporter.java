@@ -101,7 +101,7 @@ public class Exporter
         }
 
         Iterator<Post> lIterator = lPosts.iterator();
-        if(lIterator.hasNext())
+        while(lIterator.hasNext())
         {
             Post lPost = lIterator.next();
 
@@ -179,12 +179,20 @@ public class Exporter
 
                 lXmlWriter.contentTag("title", lPost.getTitle());
                 lXmlWriter.contentTag("link", lPost.getUrl());
-                lXmlWriter.contentTag("pubDate", lPost.getDate().toRssPubDate());
+                PostDate lDate = lPost.getDate();
+                if(lDate != null)
+                {
+                    lXmlWriter.contentTag("pubDate", lDate.toRssPubDate());
+                    lXmlWriter.contentTag("wp:post_date", lDate.toWpPostDate());
+                }
+                else
+                {
+                    System.out.println("Post has no date: " + lPost);
+                }
                 lXmlWriter.contentTag("guid", "isPermaLink", "false", lPost.getUrl());
                 lXmlWriter.contentTag("description", "");
-                lXmlWriter.contentTagCData("dc:creator", lPost.getUrl());
+                lXmlWriter.contentTagCData("dc:creator", "katolikus");
                 lXmlWriter.contentTagCData("content:encoded", lPost.getContent());
-                lXmlWriter.contentTagCData("excerpt:encoded", lPost.getExcerpt());
                 lXmlWriter.contentTagCData("excerpt:encoded", lPost.getExcerpt());
 
                 XmlWriter.Attributes lCategory = new XmlWriter.Attributes();
