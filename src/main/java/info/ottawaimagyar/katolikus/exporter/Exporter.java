@@ -72,7 +72,7 @@ public class Exporter
                     System.out.println("There is no ReadmoreElement");
                 }
             }
-            //break; // enable for test only
+            break; // enable for test only
         }
 
         List<List<Post>> lBucketList = lPosts.getBucketList();

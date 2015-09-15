@@ -69,6 +69,7 @@ public class Post
             for (Element lLightboxElement : lLightboxElements)
             {
                 Collection<Node> lImageNodes = extractImageNodes(lLightboxElement);
+
                 Element lParent = lLightboxElement.parent();
                 int i = lLightboxElement.siblingIndex();
                 lParent.insertChildren(i, lImageNodes);
@@ -138,8 +139,31 @@ public class Post
         Elements lImageElements = aInContent.getElementsByTag("img");
         if(!lImageElements.isEmpty())
         {
+            int i = 0;
             for (Element lImageElement : lImageElements)
             {
+                i++;
+                if(lImageElement.hasClass("float-left"))
+                {
+                    if(!lImageElement.hasClass("alignleft"))
+                    {
+                        lImageElement.addClass("alignleft");
+                    }
+                }
+                else if(lImageElement.hasClass("float-right"))
+                {
+                    if(!lImageElement.hasClass("alignright"))
+                    {
+                        lImageElement.addClass("alignright");
+                    }
+                }
+
+                if(i > 1)
+                {
+                    lImageElement.removeAttr("width");
+                    lImageElement.removeAttr("height");
+                }
+
                 Node lThisNode = toNode(lImageElement);
                 lImageNodes.add(lThisNode.clone());
             }
