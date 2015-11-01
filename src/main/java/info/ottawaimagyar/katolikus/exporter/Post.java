@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Post
+class Post
 {
     private final String url;
     private String title;

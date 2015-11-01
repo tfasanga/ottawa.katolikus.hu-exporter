@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class PostList
+class PostList
 {
     private int bucketSize = 0;
     private LinkedList<List<Post>> bucketList;

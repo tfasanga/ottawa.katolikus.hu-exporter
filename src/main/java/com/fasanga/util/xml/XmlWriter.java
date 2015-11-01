@@ -3,7 +3,7 @@
  * See "license-prefuse.txt" for licensing terms.
  */
 
-package info.ottawaimagyar.katolikus.exporter;
+package com.fasanga.util.xml;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;

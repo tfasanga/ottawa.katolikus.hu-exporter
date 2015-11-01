@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class PostDate
+class PostDate
 {
     private static final Map<String, String> dict;
     private static final Set<String> missing = new HashSet<>();

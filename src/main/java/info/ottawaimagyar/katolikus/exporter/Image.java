@@ -7,7 +7,7 @@ import org.jsoup.parser.Tag;
 
 import java.io.IOException;
 
-public class Image
+class Image
 {
     private final int width;
     private final int height;

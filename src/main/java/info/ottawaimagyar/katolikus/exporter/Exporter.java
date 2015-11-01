@@ -1,5 +1,6 @@
 package info.ottawaimagyar.katolikus.exporter;
 
+import com.fasanga.util.xml.XmlWriter;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,7 +14,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
-public class Exporter
+class Exporter
 {
     public static String getSiteUrl()
     {
