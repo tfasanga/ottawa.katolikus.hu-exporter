@@ -15,7 +15,14 @@ class Exporter
     {
         System.out.println("args = " + Arrays.toString(args));
 
+        System.out.println("<!DOCTYPE html>");
+        System.out.println("<html>");
+        System.out.println("<body>");
+
         parseHirek();
+
+        System.out.println("</body>");
+        System.out.println("</html>");
     }
 
     public static String getSiteUrl()
@@ -40,27 +47,57 @@ class Exporter
             Elements lColElements = lMulticolElement.getElementsByClass("wsite-multicol-col");
             for (Element lColElement : lColElements)
             {
-                i++;
                 removeFormElements(lColElement);
                 removeStyleElements(lColElement);
-                removeEmptyElements(lColElement);
-
-                String lHtml = lColElement.html();
-                System.out.println();
-                System.out.println("<!-- COL #" + i + " -->");
-                System.out.println(lHtml);
+                do {} while (removeEmptyElements(lColElement));
+                updateImgSrc(lColElement);
+                if(!isEmptyDivElement(lColElement))
+                {
+                    String lHtml = lColElement.html();
+                    System.out.println(lHtml);
+                    i++;
+                }
             }
             break;
         }
     }
 
-    private void removeEmptyElements(Element aInContent)
+    private void updateImgSrc(Element aInContent)
     {
+        Elements lElements = aInContent.getElementsByTag("img");
+        for (Element lElement : lElements)
+        {
+            String lSrc = lElement.attr("src");
+            if(lSrc != null)
+            {
+                if(lSrc.startsWith("/"))
+                {
+                    String lNewSrc = getSiteUrl() + lSrc;
+                    lElement.attr("src", lNewSrc);
+                }
+            }
+        }
+    }
+
+    private boolean isEmptyDivElement(Element aInContent)
+    {
+        return aInContent.tagName().equals("div") && aInContent.childNodeSize() == 0;
+    }
+
+
+    private boolean removeEmptyElements(Element aInContent)
+    {
+        boolean lRemoved = false;
         Elements lElements = aInContent.getElementsByTag("div");
         for (Element lElement : lElements)
         {
-
+            if(isEmptyDivElement(lElement))
+            {
+                lElement.remove();
+                lRemoved = true;
+            }
         }
+        return lRemoved;
     }
 
     private void removeFormElements(Element aInContent)
