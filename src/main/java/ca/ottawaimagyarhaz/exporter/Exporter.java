@@ -7,6 +7,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 class Exporter
@@ -15,14 +18,7 @@ class Exporter
     {
         System.out.println("args = " + Arrays.toString(args));
 
-        System.out.println("<!DOCTYPE html>");
-        System.out.println("<html>");
-        System.out.println("<body>");
-
         parseHirek();
-
-        System.out.println("</body>");
-        System.out.println("</html>");
     }
 
     public static String getSiteUrl()
@@ -39,26 +35,45 @@ class Exporter
 
         Element lWsiteContent = lDocument.getElementById("wsite-content");
 
+        updateImgSrc(lWsiteContent);
+        removeFormElements(lWsiteContent);
+        removeStyleElements(lWsiteContent);
+
+        final Path lOutFile = Paths.get("work", "test.html");
+        String lHtml = lWsiteContent.toString();
+        Files.write(lOutFile, lHtml.getBytes("utf-8"));
+        System.out.println("Written to: " + lOutFile);
+
+        parseContent(lWsiteContent);
+    }
+
+    private void parseContent(Element aInWsiteContent) throws IOException
+    {
+
         int i = 0;
-        Elements lMulticolElements = lWsiteContent.getElementsByClass("wsite-multicol");
+        Elements lMulticolElements = aInWsiteContent.getElementsByClass("wsite-multicol");
 
         for (Element lMulticolElement : lMulticolElements)
         {
-            Elements lColElements = lMulticolElement.getElementsByClass("wsite-multicol-col");
-            for (Element lColElement : lColElements)
+            Element lParent = lMulticolElement.parent();
+            Element lMainParent = lParent.parent();
+            if(lMainParent.id().equals("wsite-content"))
             {
-                removeFormElements(lColElement);
-                removeStyleElements(lColElement);
-                do {} while (removeEmptyElements(lColElement));
-                updateImgSrc(lColElement);
-                if(!isEmptyDivElement(lColElement))
+                StringBuilder sb = new StringBuilder();
+                String lContent = lMulticolElement.toString();
+                sb.append(lContent);
+                sb.append("\n");
+                i++;
+
+                final Path lOutFile = Paths.get("work", "test_event_" + i + ".html");
+                Files.write(lOutFile, sb.toString().getBytes("utf-8"));
+                System.out.println("Written to: " + lOutFile);
+
+                if( i >= 8)
                 {
-                    String lHtml = lColElement.html();
-                    System.out.println(lHtml);
-                    i++;
+                    break;
                 }
             }
-            break;
         }
     }
 
@@ -102,17 +117,23 @@ class Exporter
 
     private void removeFormElements(Element aInContent)
     {
-        Elements lFormElements = aInContent.getElementsByTag("form");
+        Elements lFormElements = aInContent.getElementsByClass("wsite-button");
         for (Element lFormElement : lFormElements)
         {
             lFormElement.remove();
         }
 
-        Elements lFormClasses = aInContent.getElementsByClass("wsite-form-field");
-        for (Element lFormClass : lFormClasses)
-        {
-            lFormClass.remove();
-        }
+//        Elements lFormElements = aInContent.getElementsByTag("form");
+//        for (Element lFormElement : lFormElements)
+//        {
+//            lFormElement.remove();
+//        }
+//
+//        Elements lFormClasses = aInContent.getElementsByClass("wsite-form-field");
+//        for (Element lFormClass : lFormClasses)
+//        {
+//            lFormClass.remove();
+//        }
     }
 
     private void removeStyleElements(Element aInContent)
