@@ -168,6 +168,9 @@
       <value>
         <option name="PARAMETER_NAME_PREFIX" value="aIn" />
         <option name="LOCAL_VARIABLE_NAME_PREFIX" value="l" />
+        <XML>
+          <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
+        </XML>
         <codeStyleSettings language="JAVA">
           <option name="BRACE_STYLE" value="2" />
           <option name="CLASS_BRACE_STYLE" value="2" />
